@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">myTutor</string>
+    <string name="title_activity_main">myTutor</string>
+    <string name="package_name">com.mytutor.app</string>
+    <string name="custom_url_scheme">com.mytutor.app</string>
+</resources>

@@ -1,0 +1,6 @@
+{
+  "name": "myTutor",
+  "description": "Special education and developmental tutoring platform connecting educators, therapists, and parents with session scheduling, learner milestones, and progress journals.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
