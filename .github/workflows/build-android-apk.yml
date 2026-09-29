@@ -36,12 +36,12 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Node.js (Node 22 LTS required by Capacitor 8+)
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 22
 
-      - name: Set up Java Development Kit (JDK 21 required by Capacitor 8+)
-        uses: actions/setup-java@v4
+      - name: Set up Java Development Kit (JDK 21)
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '21'
@@ -56,11 +56,13 @@ jobs:
           export PATH="$ANDROID_PATH/cmdline-tools/latest/bin:$ANDROID_PATH/platform-tools:$PATH"
           export ANDROID_HOME="$ANDROID_PATH"
 
-          echo "Accepting Android SDK licenses..."
-          yes | sdkmanager --licenses || true
+          mkdir -p "$ANDROID_PATH/licenses"
+          echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55\nd56f5187479edd1fe58921845e61a6e7079b8141\n24333f8a63b6825ea9c5514f83c2829b004d1fee" > "$ANDROID_PATH/licenses/android-sdk-license"
+          echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_PATH/licenses/android-sdk-preview-license"
 
-          echo "Ensuring Android SDK Platform 35 and Build Tools are installed..."
-          sdkmanager "platforms;android-35" "build-tools;35.0.0" "platform-tools" || true
+          echo "Ensuring Android SDK Platforms and Build Tools are installed..."
+          yes | sdkmanager "platforms;android-35" "platforms;android-36" "build-tools;35.0.0" "platform-tools" || true
+          yes | sdkmanager --licenses || true
 
           mkdir -p android
           echo "sdk.dir=$ANDROID_PATH" > android/local.properties
@@ -121,13 +123,19 @@ jobs:
         run: |
           cd android
           chmod +x ./gradlew
+          if [ ! -f "local.properties" ]; then
+            echo "sdk.dir=${ANDROID_HOME:-/usr/local/lib/android/sdk}" > local.properties
+          fi
           ./gradlew assembleDebug --stacktrace --no-daemon
           cd ..
           mkdir -p output-apk
           if [ -f "android/app/build/outputs/apk/debug/app-debug.apk" ]; then
             cp android/app/build/outputs/apk/debug/app-debug.apk output-apk/myTutor-debug.apk
           else
-            find android/app/build/outputs/apk -name "*.apk" -exec cp {} output-apk/myTutor-debug.apk \;
+            find android/app/build/outputs/apk -name "*.apk" -exec cp {} output-apk/myTutor-debug.apk \; 2>/dev/null || true
+          fi
+          if [ ! -f "output-apk/myTutor-debug.apk" ]; then
+            find . -name "*.apk" -exec cp {} output-apk/myTutor-debug.apk \; 2>/dev/null || true
           fi
           echo "Debug APK ready:"
           ls -lh output-apk/
@@ -137,10 +145,13 @@ jobs:
         run: |
           cd android
           chmod +x ./gradlew
+          if [ ! -f "local.properties" ]; then
+            echo "sdk.dir=${ANDROID_HOME:-/usr/local/lib/android/sdk}" > local.properties
+          fi
           ./gradlew assembleRelease --stacktrace --no-daemon
           cd ..
           mkdir -p output-apk
-          find android/app/build/outputs/apk -name "*.apk" -exec cp {} output-apk/ \;
+          find android/app/build/outputs/apk -name "*.apk" -exec cp {} output-apk/ \; 2>/dev/null || true
           echo "Release APK ready:"
           ls -lh output-apk/
 
