@@ -13,7 +13,7 @@ This project includes an automated **GitHub Actions CI/CD workflow** that builds
 
 2. **Build Pipeline**:
    - Checks out the repository.
-   - Sets up Node.js 22 (LTS required by Capacitor 8+) and Java JDK 17 (Android LTS).
+   - Sets up Node.js 22 (LTS required by Capacitor 8+) and Java JDK 21 (required by Capacitor 8+).
    - Configures the Android SDK and Gradle caching for fast builds.
    - Builds the production web app (`npm run build`).
    - Syncs assets into the native Android Capacitor project (`npx cap sync android`).
