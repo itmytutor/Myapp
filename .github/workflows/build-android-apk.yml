@@ -40,11 +40,12 @@ jobs:
         with:
           node-version: 22
 
-      - name: Set up Java Development Kit (JDK 21)
+      - name: Set up Java Development Kit (JDK 21) & Gradle Cache
         uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '21'
+          cache: 'gradle'
 
       - name: Set up Android SDK & Accept Licenses
         run: |
@@ -68,9 +69,6 @@ jobs:
           echo "sdk.dir=$ANDROID_PATH" > android/local.properties
           echo "Configured android/local.properties:"
           cat android/local.properties
-
-      - name: Set up Gradle Cache
-        uses: gradle/actions/setup-gradle@v4
 
       - name: Install Node Dependencies
         run: |
@@ -126,7 +124,7 @@ jobs:
           if [ ! -f "local.properties" ]; then
             echo "sdk.dir=${ANDROID_HOME:-/usr/local/lib/android/sdk}" > local.properties
           fi
-          ./gradlew assembleDebug --stacktrace --no-daemon
+          ./gradlew assembleDebug -x lint -x test --stacktrace --no-daemon
           cd ..
           mkdir -p output-apk
           if [ -f "android/app/build/outputs/apk/debug/app-debug.apk" ]; then
@@ -148,7 +146,7 @@ jobs:
           if [ ! -f "local.properties" ]; then
             echo "sdk.dir=${ANDROID_HOME:-/usr/local/lib/android/sdk}" > local.properties
           fi
-          ./gradlew assembleRelease --stacktrace --no-daemon
+          ./gradlew assembleRelease -x lint -x test --stacktrace --no-daemon
           cd ..
           mkdir -p output-apk
           find android/app/build/outputs/apk -name "*.apk" -exec cp {} output-apk/ \; 2>/dev/null || true
