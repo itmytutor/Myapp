@@ -20,20 +20,6 @@ allprojects {
     }
 }
 
-subprojects {
-    afterEvaluate { project ->
-        if (project.hasProperty('android')) {
-            project.android {
-                lintOptions {
-                    abortOnError false
-                    warningsAsErrors false
-                    checkReleaseBuilds false
-                }
-            }
-        }
-    }
-}
-
 tasks.register('clean', Delete) {
     delete rootProject.layout.buildDirectory
 }
